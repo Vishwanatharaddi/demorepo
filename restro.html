@@ -1,0 +1,117 @@
+<html>
+    <body>
+        <form  onsubmit="saveToLocalStorage(event)">
+            <label> Choose price:</label>
+            <input id='chooseprice' type="number" name="chooseprice"  required/>
+            <label> Choose dish:</label>
+            <input id='choosedish' type="dish" name="choosedish"  required/>
+            <label for="choosetable">Choose table:</label>
+            <select id="choosetable">
+            <option value="table1">Table 1</option>
+            <option value="table2">Table 2</option>
+            <option value="table3">Table 3</option>
+            <option value="table4">Table 4</option>  
+<input type="submit" value="Add to bill">
+      </form>
+        <h1>Orders</h1><br></br>
+        <h2>Table 1</h2><br></br>
+        <h2>Table 2</h2><br></br>
+        <h2>Table 3</h2><br></br>
+        <h2>Table 4</h2><br></br>
+        
+        <ul id='listOfUsers'></ul>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
+        <script>
+            function saveToLocalStorage(event) {
+                event.preventDefault();
+                const chooseprice = event.target.chooseprice.value;
+                const  choosedish= event.target.choosedish.value;
+                const choosetable = event.target.choosetable.value;
+                
+                const obj = {
+                    chooseprice,
+                    choosedish,
+                    choosetable
+                }
+            
+                axios.post("https://crudcrud.com/api/b6964713105146749520e914f885875a/hotelTableBookingData",obj)
+                    .then((response) => {
+                        showNewUserOnScreen(response.data)
+            
+                    })
+                    .catch((err) => {
+                        document.body.innerHTML = document.body.innerHTML + "<h4> Something went wrong </h4>" 
+                        console.log(err)
+                    })    
+
+            }
+
+            window.addEventListener("DOMContentLoaded", () => {
+              const data = axios.get("https://crudcrud.com/api/b6964713105146749520e914f885875a/hotelTableBookingData")
+               .then((response) => {
+                console.log(response)
+
+                for(var i=0; i < response.data.length; i++){
+                    showNewUserOnScreen(response.data[i])
+                }
+               })
+               .catch((error) =>{
+                console.log(error)
+               })
+              
+            })  
+                       
+            function showNewUserOnScreen(user){
+                document.getElementById('chooseprice').value = '';
+                document.getElementById('choosedish').value = '';
+                document.getElementById('choosetable').value ='';
+        
+                if(localStorage.getItem(user.choosedish) !== null){
+                   removeUserFromScreen(user.choosedish)
+               }
+
+              
+                const parentNode = document.getElementById('listOfUsers');
+                const childHTML = `<li id=${user._id}> ${user.chooseprice} - ${user.choosedish} - ${user.choosetable}
+                                        <button onclick=deleteUser('${user.choosedish}','${user._id}')> Delete Order </button>
+                                        <button onclick=editUserDetails('${user.chooseprice}','${user.choosedish}','${user.choosetable}','${user._id}')>Edit Order </button>
+                                     </li>`
+
+                parentNode.innerHTML = parentNode.innerHTML + childHTML;
+            }
+
+            //Edit User
+
+            function editUserDetails(chooseprice, choosedish, choosetable, userId){
+
+                document.getElementById('choosedish').value = choosedish;
+                document.getElementById('chooseprice').value = chooseprice;
+                document.getElementById('choosetable').value =choosetable;
+
+                deleteUser(choosedish, userId)
+             }
+
+            // deleteUser
+
+            function deleteUser(choosedish, userId){
+               axios.delete(`https://crudcrud.com/api/b6964713105146749520e914f885875a/hotelTableBookingData/${userId}`)
+               .then(() => {
+                   removeUserFromScreen(userId)
+            }) 
+                .catch((error) =>{
+                    console.log(error)
+                })
+            
+            }
+
+            function removeUserFromScreen(userId){
+                const parentNode = document.getElementById('listOfUsers');
+                const childNodeToBeDeleted = document.getElementById(userId);
+                if(childNodeToBeDeleted) {
+                    parentNode.removeChild(childNodeToBeDeleted)
+                }
+            }
+
+        </script>
+    </body>
+</html>
