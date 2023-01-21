@@ -15,11 +15,14 @@
       </form>
         <h1>Orders</h1><br></br>
         <h2>Table 1</h2><br></br>
+        <ul id='table1'></ul>
         <h2>Table 2</h2><br></br>
+        <ul id='table2'></ul>
         <h2>Table 3</h2><br></br>
+        <ul id='table3'></ul>
         <h2>Table 4</h2><br></br>
-        
-        <ul id='listOfUsers'></ul>
+        <ul id='table4'></ul>
+    
         <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
         <script>
             function saveToLocalStorage(event) {
@@ -34,7 +37,7 @@
                     choosetable
                 }
             
-                axios.post("https://crudcrud.com/api/b6964713105146749520e914f885875a/hotelTableBookingData",obj)
+                axios.post("https://crudcrud.com/api/013fc6706c464045939eb36bdf2bed79/hotelTableBookingData",obj)
                     .then((response) => {
                         showNewUserOnScreen(response.data)
             
@@ -47,7 +50,7 @@
             }
 
             window.addEventListener("DOMContentLoaded", () => {
-              const data = axios.get("https://crudcrud.com/api/b6964713105146749520e914f885875a/hotelTableBookingData")
+              const data = axios.get("https://crudcrud.com/api/013fc6706c464045939eb36bdf2bed79/hotelTableBookingData")
                .then((response) => {
                 console.log(response)
 
@@ -71,10 +74,10 @@
                }
 
               
-                const parentNode = document.getElementById('listOfUsers');
+                const parentNode = document.getElementById(user.choosetable);
                 const childHTML = `<li id=${user._id}> ${user.chooseprice} - ${user.choosedish} - ${user.choosetable}
-                                        <button onclick=deleteUser('${user.choosedish}','${user._id}')> Delete Order </button>
-                                        <button onclick=editUserDetails('${user.chooseprice}','${user.choosedish}','${user.choosetable}','${user._id}')>Edit Order </button>
+                                        <button onclick=deleteUser('${user.choosedish}','${user._id}','${user.choosetable}')> Delete Order </button>
+                                        <button onclick=editUserDetails('${user.chooseprice}','${user.choosedish}','${user.choosetable}','${user._id}')> Edit Order </button>
                                      </li>`
 
                 parentNode.innerHTML = parentNode.innerHTML + childHTML;
@@ -88,15 +91,15 @@
                 document.getElementById('chooseprice').value = chooseprice;
                 document.getElementById('choosetable').value =choosetable;
 
-                deleteUser(choosedish, userId)
+                deleteUser(choosedish, userId, choosetable)
              }
 
             // deleteUser
 
-            function deleteUser(choosedish, userId){
-               axios.delete(`https://crudcrud.com/api/b6964713105146749520e914f885875a/hotelTableBookingData/${userId}`)
+            function deleteUser(choosedish, userId, choosetable){
+               axios.delete(`https://crudcrud.com/api/013fc6706c464045939eb36bdf2bed79/hotelTableBookingData/${userId}`)
                .then(() => {
-                   removeUserFromScreen(userId)
+                   removeUserFromScreen(userId, choosetable)
             }) 
                 .catch((error) =>{
                     console.log(error)
@@ -104,8 +107,8 @@
             
             }
 
-            function removeUserFromScreen(userId){
-                const parentNode = document.getElementById('listOfUsers');
+            function removeUserFromScreen(userId, choosetable){
+                const parentNode = document.getElementById(choosetable);
                 const childNodeToBeDeleted = document.getElementById(userId);
                 if(childNodeToBeDeleted) {
                     parentNode.removeChild(childNodeToBeDeleted)
